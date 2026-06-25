@@ -24,19 +24,19 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
 
-      - uses: cachix/install-nix-action@v27
+      - uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v4
 
       - name: Regenerate schema, docs and flake vendorHash
         run: |
@@ -45,7 +45,7 @@ jobs:
           just sync-flake
 
       - name: Commit regenerated artifacts
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: regenerate docs, schema and flake vendorHash"
           file_pattern: "schema/config.schema.json docs/configuration.md docs/api.md flake.nix"

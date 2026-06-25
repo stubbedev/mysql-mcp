@@ -66,9 +66,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
       - uses: cachix/install-nix-action@v27
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
+      - uses: extractions/setup-just@v2
+      # Align flake.nix vendorHash with go.sum before building. On a dependency
+      # bump (e.g. a Dependabot PR) the committed hash is stale; this validates
+      # the PR with the correct hash. generate.yml commits the fix to master on
+      # merge. No-op when go.sum is unchanged.
+      - run: just sync-flake
       - run: nix build .#default
       - run: nix flake check

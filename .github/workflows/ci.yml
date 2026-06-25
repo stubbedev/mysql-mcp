@@ -13,9 +13,9 @@ jobs:
     name: Go build & test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
@@ -50,12 +50,12 @@ jobs:
     name: golangci-lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
-      - uses: golangci/golangci-lint-action@v8
+      - uses: golangci/golangci-lint-action@v9
         with:
           # v2.x is built with a recent Go; older v1 releases (built with go1.24)
           # refuse our go 1.25 target with "language version lower than targeted".
@@ -65,16 +65,16 @@ jobs:
     name: Nix build & flake check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
-      - uses: cachix/install-nix-action@v27
+      - uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v4
       # Align flake.nix vendorHash with go.sum before building. On a dependency
       # bump (e.g. a Dependabot PR) the committed hash is stale; this validates
       # the PR with the correct hash. generate.yml commits the fix to master on

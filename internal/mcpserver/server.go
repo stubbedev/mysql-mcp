@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/abs/mysql-mcp/internal/source"
-	"github.com/abs/mysql-mcp/internal/sqlguard"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/stubbedev/mysql-mcp/internal/source"
+	"github.com/stubbedev/mysql-mcp/internal/sqlguard"
 )
 
 // Service holds the dependencies shared by all tool handlers.

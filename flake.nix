@@ -20,8 +20,10 @@
           inherit version;
           src = ./.;
 
-          # vendorHash is maintained automatically by CI (.github/workflows/generate.yml).
-          # Run `scripts/update-vendor-hash.sh` to refresh it locally.
+          # vendorHash is kept in sync with go.sum by `just sync-flake` (and by
+          # CI on master). The `# go-sum:` line caches the go.sum digest so the
+          # recipe can skip a nix build when nothing changed.
+          # go-sum: b284af1dd0dc8a753706fbd5e27c0e4b5523e2b80dbdd90d0ffa9db7b42d3393
           vendorHash = "sha256-sOvzRBzcHVp7yBLncFiuQJD2li5P61t2ed9AjKGvRYc=";
 
           subPackages = [ "cmd/mysql-mcp" ];
@@ -29,7 +31,7 @@
           ldflags = [
             "-s"
             "-w"
-            "-X github.com/abs/mysql-mcp/internal/cli.Version=${version}"
+            "-X github.com/stubbedev/mysql-mcp/internal/cli.Version=${version}"
           ];
 
           meta = with pkgs.lib; {
@@ -45,6 +47,7 @@
             pkgs.gopls
             pkgs.golangci-lint
             pkgs.gomarkdoc
+            pkgs.just
           ];
         };
 

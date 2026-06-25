@@ -3,7 +3,7 @@
 # mysql\-mcp
 
 ```go
-import "github.com/abs/mysql-mcp/cmd/mysql-mcp"
+import "github.com/stubbedev/mysql-mcp/cmd/mysql-mcp"
 ```
 
 Command mysql\-mcp is an MCP server exposing MySQL/MariaDB databases to MCP clients over stdio or HTTP.
@@ -15,7 +15,7 @@ Command mysql\-mcp is an MCP server exposing MySQL/MariaDB databases to MCP clie
 # cli
 
 ```go
-import "github.com/abs/mysql-mcp/internal/cli"
+import "github.com/stubbedev/mysql-mcp/internal/cli"
 ```
 
 Package cli implements the mysql\-mcp command\-line interface.
@@ -50,7 +50,7 @@ Execute runs the root command.
 # config
 
 ```go
-import "github.com/abs/mysql-mcp/internal/config"
+import "github.com/stubbedev/mysql-mcp/internal/config"
 ```
 
 Package config defines the on\-disk configuration for mysql\-mcp and the logic to locate, load, expand and validate it. A single set of Go structs drives JSON unmarshalling, runtime validation, the generated JSON Schema and the generated configuration docs.
@@ -84,7 +84,7 @@ const AppName = "mysql-mcp"
 <a name="SchemaID"></a>SchemaID is the canonical $id of the generated config schema.
 
 ```go
-const SchemaID = "https://github.com/abs/mysql-mcp/raw/main/schema/config.schema.json"
+const SchemaID = "https://github.com/stubbedev/mysql-mcp/raw/master/schema/config.schema.json"
 ```
 
 <a name="DefaultConfigPath"></a>
@@ -291,7 +291,7 @@ Name returns the source's logical name \(its key in the sources map\).
 # engine
 
 ```go
-import "github.com/abs/mysql-mcp/internal/engine"
+import "github.com/stubbedev/mysql-mcp/internal/engine"
 ```
 
 Package engine abstracts the SQL dialect specifics behind a small interface so additional databases \(PostgreSQL/CockroachDB, SQLite\) can be added without touching the source registry or MCP layer. This release implements MySQL, which also covers MariaDB.
@@ -351,7 +351,7 @@ type Query struct {
 # mcpserver
 
 ```go
-import "github.com/abs/mysql-mcp/internal/mcpserver"
+import "github.com/stubbedev/mysql-mcp/internal/mcpserver"
 ```
 
 Package mcpserver wires the source registry into an MCP server, exposing a small set of tools for inspecting and querying the configured databases.
@@ -405,7 +405,7 @@ type Service struct {
 # source
 
 ```go
-import "github.com/abs/mysql-mcp/internal/source"
+import "github.com/stubbedev/mysql-mcp/internal/source"
 ```
 
 Package source turns the validated config into live, lazily\-connected database handles. Each named source owns one \*sql.DB connection pool and, when configured, one SSH tunnel that the database driver dials through.
@@ -628,7 +628,7 @@ RunQuery executes a read query and collects all rows. Column values that come ba
 # sqlguard
 
 ```go
-import "github.com/abs/mysql-mcp/internal/sqlguard"
+import "github.com/stubbedev/mysql-mcp/internal/sqlguard"
 ```
 
 Package sqlguard classifies SQL statements so the server can enforce read\-only sources. It parses the statement with a real MySQL parser rather than matching on string prefixes, which would be trivial to bypass \(e.g. leading comments, whitespace or casing\).

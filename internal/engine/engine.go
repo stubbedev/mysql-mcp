@@ -7,7 +7,7 @@ package engine
 import (
 	"fmt"
 
-	"github.com/abs/mysql-mcp/internal/config"
+	"github.com/stubbedev/mysql-mcp/internal/config"
 )
 
 // Query is a SQL string plus its positional arguments.

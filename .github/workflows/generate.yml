@@ -2,10 +2,10 @@ name: Generate
 
 # Regenerates derived artifacts (config JSON Schema, config docs, API docs and
 # the flake vendorHash) and commits them back to the branch. Runs on pushes to
-# main and on demand.
+# master and on demand.
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "**.go"
       - "go.mod"
@@ -36,19 +36,13 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Generate config schema
-        run: go run ./cmd/mysql-mcp gen-schema
+      - uses: extractions/setup-just@v2
 
-      - name: Generate config docs
-        run: go run ./cmd/mysql-mcp gen-config-docs
-
-      - name: Generate API docs
+      - name: Regenerate schema, docs and flake vendorHash
         run: |
-          go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
-          "$(go env GOPATH)/bin/gomarkdoc" --output docs/api.md ./...
-
-      - name: Update flake vendorHash
-        run: bash scripts/update-vendor-hash.sh
+          just sync-schema
+          just sync-docs
+          just sync-flake
 
       - name: Commit regenerated artifacts
         uses: stefanzweifel/git-auto-commit-action@v5

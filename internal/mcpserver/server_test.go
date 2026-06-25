@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/abs/mysql-mcp/internal/config"
-	"github.com/abs/mysql-mcp/internal/source"
+	"github.com/stubbedev/mysql-mcp/internal/config"
+	"github.com/stubbedev/mysql-mcp/internal/source"
 )
 
 func testRegistry(t *testing.T, json string) *source.Registry {

@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/abs/mysql-mcp/internal/config"
-	"github.com/abs/mysql-mcp/internal/mcpserver"
-	"github.com/abs/mysql-mcp/internal/source"
 	"github.com/spf13/cobra"
+	"github.com/stubbedev/mysql-mcp/internal/config"
+	"github.com/stubbedev/mysql-mcp/internal/mcpserver"
+	"github.com/stubbedev/mysql-mcp/internal/source"
 )
 
 // Build information, overridable via -ldflags at build time.

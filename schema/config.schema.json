@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/abs/mysql-mcp/raw/main/schema/config.schema.json",
+  "$id": "https://github.com/stubbedev/mysql-mcp/raw/master/schema/config.schema.json",
   "$ref": "#/$defs/Config",
   "$defs": {
     "Config": {

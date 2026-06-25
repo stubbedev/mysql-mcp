@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/abs/mysql-mcp/internal/config"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/stubbedev/mysql-mcp/internal/config"
 )
 
 // ServeStdio runs the server over stdio until ctx is cancelled or the client

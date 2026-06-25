@@ -9,7 +9,7 @@ import (
 )
 
 // SchemaID is the canonical $id of the generated config schema.
-const SchemaID = "https://github.com/abs/mysql-mcp/raw/main/schema/config.schema.json"
+const SchemaID = "https://github.com/stubbedev/mysql-mcp/raw/master/schema/config.schema.json"
 
 // decodeStrict unmarshals config JSON, rejecting unknown fields so typos in the
 // config surface as errors rather than being silently ignored.
@@ -33,7 +33,7 @@ func GenerateSchema() ([]byte, error) {
 		RequiredFromJSONSchemaTags: false,
 	}
 	// Best effort: enrich the schema with doc comments from the source tree.
-	_ = r.AddGoComments("github.com/abs/mysql-mcp", "./internal/config")
+	_ = r.AddGoComments("github.com/stubbedev/mysql-mcp", "./internal/config")
 
 	schema := r.Reflect(&Config{})
 	schema.ID = jsonschema.ID(SchemaID)

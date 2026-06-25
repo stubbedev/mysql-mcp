@@ -4,6 +4,7 @@
 
 # Compiled binaries
 /mysql-mcp
+/bin/
 /dist/
 
 # Go test artifacts

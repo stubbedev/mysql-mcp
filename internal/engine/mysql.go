@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/abs/mysql-mcp/internal/config"
 	"github.com/go-sql-driver/mysql"
+	"github.com/stubbedev/mysql-mcp/internal/config"
 )
 
 // mysqlEngine implements Engine for MySQL and MariaDB (identical wire protocol).

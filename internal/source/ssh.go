@@ -8,8 +8,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/abs/mysql-mcp/internal/config"
 	"github.com/go-sql-driver/mysql"
+	"github.com/stubbedev/mysql-mcp/internal/config"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )

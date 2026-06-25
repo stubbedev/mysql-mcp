@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abs/mysql-mcp/internal/config"
+	"github.com/stubbedev/mysql-mcp/internal/config"
 )
 
 func TestForUnsupported(t *testing.T) {

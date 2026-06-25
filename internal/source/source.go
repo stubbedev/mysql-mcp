@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/abs/mysql-mcp/internal/config"
-	"github.com/abs/mysql-mcp/internal/engine"
+	"github.com/stubbedev/mysql-mcp/internal/config"
+	"github.com/stubbedev/mysql-mcp/internal/engine"
 )
 
 // Source is a single configured database plus its connection state.

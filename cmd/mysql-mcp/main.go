@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/abs/mysql-mcp/internal/cli"
+	"github.com/stubbedev/mysql-mcp/internal/cli"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/abs/mysql-mcp
+module github.com/stubbedev/mysql-mcp
 
 go 1.25.0
 

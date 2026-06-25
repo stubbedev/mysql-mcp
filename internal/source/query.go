@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/abs/mysql-mcp/internal/engine"
+	"github.com/stubbedev/mysql-mcp/internal/engine"
 )
 
 // RawQuery wraps a bare SQL string (no positional args) as an engine.Query.

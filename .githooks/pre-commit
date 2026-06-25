@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Pre-commit gate: refuse commits that aren't gofmt-clean or fail go vet.
+# Enable with `just install-hooks`. Bypass a single commit with --no-verify.
+set -euo pipefail
+
+unformatted="$(gofmt -l .)"
+if [ -n "$unformatted" ]; then
+    echo "pre-commit: these files are not gofmt-clean (run 'just fmt'):" >&2
+    printf '%s\n' "$unformatted" >&2
+    exit 1
+fi
+
+go vet ./... || {
+    echo "pre-commit: go vet failed" >&2
+    exit 1
+}

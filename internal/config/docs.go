@@ -14,7 +14,7 @@ import (
 // generators on one source of truth means the docs cannot drift from the schema.
 func GenerateDocs() (string, error) {
 	r := &jsonschema.Reflector{}
-	_ = r.AddGoComments("github.com/abs/mysql-mcp", "./internal/config")
+	_ = r.AddGoComments("github.com/stubbedev/mysql-mcp", "./internal/config")
 	schema := r.Reflect(&Config{})
 
 	var b strings.Builder

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://github.com/abs/mysql-mcp/raw/main/schema/config.schema.json",
+  "$schema": "https://github.com/stubbedev/mysql-mcp/raw/master/schema/config.schema.json",
   "http": {
     "addr": "127.0.0.1:7000",
     "path": "/mcp",

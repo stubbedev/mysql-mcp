@@ -1,0 +1,12 @@
+# Nix build output
+/result
+/result-*
+
+# Compiled binaries
+/mysql-mcp
+/dist/
+
+# Go test artifacts
+*.test
+*.out
+coverage.txt

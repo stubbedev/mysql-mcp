@@ -1,0 +1,42 @@
+{
+  "$schema": "https://github.com/abs/mysql-mcp/raw/main/schema/config.schema.json",
+  "http": {
+    "addr": "127.0.0.1:7000",
+    "path": "/mcp",
+    "stateless": false,
+    "json_response": false,
+    "disable_dns_rebind_protection": false
+  },
+  "sources": {
+    "local": {
+      "engine": "mysql",
+      "host": "127.0.0.1",
+      "port": 3306,
+      "user": "root",
+      "password": "${LOCAL_DB_PASSWORD}",
+      "database": "app",
+      "readonly": true
+    },
+    "reporting": {
+      "engine": "mariadb",
+      "host": "10.0.0.5",
+      "port": 3306,
+      "user": "readonly",
+      "password": "${REPORTING_DB_PASSWORD}",
+      "database": "analytics",
+      "readonly": true,
+      "ssh": {
+        "host": "bastion.example.com",
+        "port": 22,
+        "user": "deploy",
+        "private_key_path": "~/.ssh/id_ed25519",
+        "known_hosts_path": "~/.ssh/known_hosts"
+      }
+    },
+    "scratch": {
+      "engine": "mysql",
+      "dsn": "dev:${DEV_DB_PASSWORD}@tcp(127.0.0.1:3307)/scratch",
+      "readonly": false
+    }
+  }
+}

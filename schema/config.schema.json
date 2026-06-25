@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/abs/mysql-mcp/raw/main/schema/config.schema.json",
+  "$ref": "#/$defs/Config",
+  "$defs": {
+    "Config": {
+      "properties": {
+        "http": {
+          "$ref": "#/$defs/HTTPConfig",
+          "description": "HTTP holds settings for the streamable HTTP transport."
+        },
+        "sources": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SourceConfig"
+          },
+          "type": "object",
+          "description": "Sources maps a logical source name to its database connection settings.\nAt least one source is required. The source name is what MCP clients pass\nin the \"source\" argument of each tool call."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "sources"
+      ],
+      "description": "Config is the root configuration object."
+    },
+    "HTTPConfig": {
+      "properties": {
+        "addr": {
+          "type": "string",
+          "description": "Addr is the listen address for the HTTP transport, host:port. Because the\nserver is meant to run on the same machine as its consumer, this defaults\nto a loopback address."
+        },
+        "path": {
+          "type": "string",
+          "description": "Path is the URL path the MCP endpoint is mounted on."
+        },
+        "stateless": {
+          "type": "boolean",
+          "description": "Stateless serves each request without server-side session affinity. Set\nthis when running behind an MCP proxy or load balancer that may not pin a\nclient to one backend."
+        },
+        "json_response": {
+          "type": "boolean",
+          "description": "JSONResponse returns application/json instead of text/event-stream. Useful\nbehind proxies that buffer or do not support Server-Sent Events."
+        },
+        "disable_dns_rebind_protection": {
+          "type": "boolean",
+          "description": "DisableDNSRebindProtection turns off the default localhost DNS-rebinding\nguard. Enable it only when a trusted MCP proxy forwards requests with a\nnon-localhost Host header; do not expose the server to untrusted networks."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "HTTPConfig configures the streamable HTTP transport."
+    },
+    "SSHConfig": {
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "Host is the SSH server hostname."
+        },
+        "port": {
+          "type": "integer",
+          "description": "Port is the SSH server port. Defaults to 22."
+        },
+        "user": {
+          "type": "string",
+          "description": "User is the SSH login user."
+        },
+        "password": {
+          "type": "string",
+          "description": "Password is an optional SSH password. Supports ${ENV_VAR} expansion.\nPrefer key-based auth via PrivateKeyPath."
+        },
+        "private_key_path": {
+          "type": "string",
+          "description": "PrivateKeyPath is the path to a private key for public-key auth. Supports\n~ and ${ENV_VAR} expansion."
+        },
+        "private_key_passphrase": {
+          "type": "string",
+          "description": "PrivateKeyPassphrase decrypts an encrypted private key. Supports\n${ENV_VAR} expansion."
+        },
+        "known_hosts_path": {
+          "type": "string",
+          "description": "KnownHostsPath is the known_hosts file used to verify the SSH host key.\nDefaults to ~/.ssh/known_hosts. Host-key verification is always enforced."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "host",
+        "user"
+      ],
+      "description": "SSHConfig describes an SSH tunnel used to reach a remote database."
+    },
+    "SourceConfig": {
+      "properties": {
+        "engine": {
+          "type": "string",
+          "description": "Engine selects the database dialect. Supported in this release: \"mysql\"\nand \"mariadb\" (handled identically)."
+        },
+        "dsn": {
+          "type": "string",
+          "description": "DSN is a complete go-sql-driver/mysql data source name. When set, the\ndiscrete host/port/user/password/database fields are ignored. The DSN\nmust not specify a custom net when SSH is configured."
+        },
+        "host": {
+          "type": "string",
+          "description": "Host is the database host. Defaults to 127.0.0.1."
+        },
+        "port": {
+          "type": "integer",
+          "description": "Port is the database port. Defaults to 3306."
+        },
+        "user": {
+          "type": "string",
+          "description": "User is the database user."
+        },
+        "password": {
+          "type": "string",
+          "description": "Password is the database password. Supports ${ENV_VAR} expansion so the\nsecret can live in the environment rather than on disk."
+        },
+        "database": {
+          "type": "string",
+          "description": "Database is the default schema to connect to. May be empty."
+        },
+        "readonly": {
+          "type": "boolean",
+          "description": "Readonly forbids any statement that is not a pure read on this source.\nRead-only sources reject the write_query tool and any non-SELECT/SHOW/\nDESCRIBE/EXPLAIN statement."
+        },
+        "ssh": {
+          "$ref": "#/$defs/SSHConfig",
+          "description": "SSH, when set, tunnels the database connection through an SSH host. The\ndatabase host/port are resolved from the SSH server's perspective."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "engine"
+      ],
+      "description": "SourceConfig describes a single database a client can query."
+    }
+  },
+  "title": "mysql-mcp configuration"
+}

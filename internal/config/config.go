@@ -26,6 +26,10 @@ type Config struct {
 	// HTTP holds settings for the streamable HTTP transport.
 	HTTP HTTPConfig `json:"http,omitempty"`
 
+	// QueryTimeoutSeconds caps how long a single query or statement may run
+	// before it is cancelled. Defaults to 30 when unset.
+	QueryTimeoutSeconds int `json:"query_timeout_seconds,omitempty" validate:"omitempty,min=1"`
+
 	// Sources maps a logical source name to its database connection settings.
 	// At least one source is required. The source name is what MCP clients pass
 	// in the "source" argument of each tool call.
@@ -196,6 +200,9 @@ func (c *Config) applyDefaults() {
 	}
 	if c.HTTP.Path == "" {
 		c.HTTP.Path = "/mcp"
+	}
+	if c.QueryTimeoutSeconds == 0 {
+		c.QueryTimeoutSeconds = 30
 	}
 	for name, src := range c.Sources {
 		src.name = name

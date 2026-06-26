@@ -6,26 +6,40 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/stubbedev/mysql-mcp/internal/source"
 	"github.com/stubbedev/mysql-mcp/internal/sqlguard"
 )
 
+// defaultRowLimit caps read_query rows when the caller omits an explicit limit.
+const defaultRowLimit = 1000
+
 // Service holds the dependencies shared by all tool handlers.
 type Service struct {
 	reg              *source.Registry
 	readonlyOverride bool
+	queryTimeout     time.Duration
 }
 
 // New builds an MCP server exposing the database tools. readonlyOverride forces
 // every source to behave as read-only regardless of its config (the global
-// --read-only flag).
-func New(reg *source.Registry, version string, readonlyOverride bool) *mcp.Server {
-	svc := &Service{reg: reg, readonlyOverride: readonlyOverride}
+// --read-only flag). queryTimeout caps each query/statement (<=0 disables it).
+func New(reg *source.Registry, version string, readonlyOverride bool, queryTimeout time.Duration) *mcp.Server {
+	svc := &Service{reg: reg, readonlyOverride: readonlyOverride, queryTimeout: queryTimeout}
 	srv := mcp.NewServer(&mcp.Implementation{Name: "mysql-mcp", Version: version}, nil)
 	svc.register(srv)
 	return srv
+}
+
+// withTimeout derives a per-query context bounded by the configured timeout.
+// When no timeout is set it returns ctx with a no-op cancel.
+func (s *Service) withTimeout(ctx context.Context) (context.Context, context.CancelFunc) {
+	if s.queryTimeout <= 0 {
+		return ctx, func() {}
+	}
+	return context.WithTimeout(ctx, s.queryTimeout)
 }
 
 // isReadonly reports whether the source must be treated as read-only.
@@ -56,7 +70,7 @@ func (s *Service) register(srv *mcp.Server) {
 
 	mcp.AddTool(srv, &mcp.Tool{
 		Name:        "read_query",
-		Description: "Run a read-only query (SELECT/SHOW/DESCRIBE/EXPLAIN) and return the rows. Arguments: source (required); sql (required). Non-read statements are rejected.",
+		Description: "Run a read-only query (SELECT/SHOW/DESCRIBE/EXPLAIN) and return the rows. Arguments: source (required); sql (required); limit (optional, max rows to return, default 1000). Non-read statements are rejected. The result's truncated flag indicates more rows were available.",
 	}, s.readQuery)
 
 	mcp.AddTool(srv, &mcp.Tool{
@@ -79,6 +93,7 @@ type sourceInput struct {
 type queryInput struct {
 	Source string `json:"source"`
 	SQL    string `json:"sql"`
+	Limit  int    `json:"limit,omitempty"`
 }
 
 type tablesInput struct {
@@ -127,6 +142,8 @@ func (s *Service) listDatabases(ctx context.Context, _ *mcp.CallToolRequest, in 
 	if err != nil {
 		return errorReply[namesOutput]("%v", err)
 	}
+	ctx, cancel := s.withTimeout(ctx)
+	defer cancel()
 	values, err := src.QueryColumn(ctx, src.Engine().ListDatabases().SQL)
 	if err != nil {
 		return errorReply[namesOutput]("list databases: %v", err)
@@ -139,7 +156,9 @@ func (s *Service) listTables(ctx context.Context, _ *mcp.CallToolRequest, in tab
 	if err != nil {
 		return errorReply[*source.ResultSet]("%v", err)
 	}
-	rs, err := src.RunQuery(ctx, src.Engine().ListTables(in.Database))
+	ctx, cancel := s.withTimeout(ctx)
+	defer cancel()
+	rs, err := src.RunQuery(ctx, src.Engine().ListTables(in.Database), defaultRowLimit)
 	if err != nil {
 		return errorReply[*source.ResultSet]("list tables: %v", err)
 	}
@@ -154,7 +173,9 @@ func (s *Service) describeTable(ctx context.Context, _ *mcp.CallToolRequest, in 
 	if err != nil {
 		return errorReply[*source.ResultSet]("%v", err)
 	}
-	rs, err := src.RunQuery(ctx, src.Engine().DescribeTable(in.Database, in.Table))
+	ctx, cancel := s.withTimeout(ctx)
+	defer cancel()
+	rs, err := src.RunQuery(ctx, src.Engine().DescribeTable(in.Database, in.Table), defaultRowLimit)
 	if err != nil {
 		return errorReply[*source.ResultSet]("describe table: %v", err)
 	}
@@ -169,7 +190,13 @@ func (s *Service) readQuery(ctx context.Context, _ *mcp.CallToolRequest, in quer
 	if err := sqlguard.EnsureReadOnly(in.SQL); err != nil {
 		return errorReply[*source.ResultSet]("%v", err)
 	}
-	rs, err := src.RunQuery(ctx, source.RawQuery(in.SQL))
+	limit := in.Limit
+	if limit <= 0 {
+		limit = defaultRowLimit
+	}
+	ctx, cancel := s.withTimeout(ctx)
+	defer cancel()
+	rs, err := src.RunQuery(ctx, source.RawQuery(in.SQL), limit)
 	if err != nil {
 		return errorReply[*source.ResultSet]("query failed: %v", err)
 	}
@@ -184,6 +211,8 @@ func (s *Service) writeQuery(ctx context.Context, _ *mcp.CallToolRequest, in que
 	if s.isReadonly(src) {
 		return errorReply[*source.ExecResult]("source %q is read-only; write_query is not permitted", in.Source)
 	}
+	ctx, cancel := s.withTimeout(ctx)
+	defer cancel()
 	res, err := src.RunExec(ctx, in.SQL)
 	if err != nil {
 		return errorReply[*source.ExecResult]("write failed: %v", err)
@@ -196,7 +225,9 @@ func (s *Service) explainQuery(ctx context.Context, _ *mcp.CallToolRequest, in q
 	if err != nil {
 		return errorReply[*source.ResultSet]("%v", err)
 	}
-	rs, err := src.RunQuery(ctx, source.RawQuery("EXPLAIN "+in.SQL))
+	ctx, cancel := s.withTimeout(ctx)
+	defer cancel()
+	rs, err := src.RunQuery(ctx, source.RawQuery("EXPLAIN "+in.SQL), defaultRowLimit)
 	if err != nil {
 		return errorReply[*source.ResultSet]("explain failed: %v", err)
 	}

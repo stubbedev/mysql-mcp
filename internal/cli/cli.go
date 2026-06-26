@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/stubbedev/mysql-mcp/internal/config"
@@ -65,7 +66,7 @@ func serveCmd() *cobra.Command {
 			}
 			defer reg.Close()
 
-			srv := mcpserver.New(reg, Version, readOnly)
+			srv := mcpserver.New(reg, Version, readOnly, time.Duration(cfg.QueryTimeoutSeconds)*time.Second)
 			// Logs go to stderr so they never corrupt the stdio JSON-RPC stream.
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 

@@ -13,9 +13,10 @@ func RawQuery(sql string) engine.Query { return engine.Query{SQL: sql} }
 
 // ResultSet is a generic, JSON-friendly query result.
 type ResultSet struct {
-	Columns  []string `json:"columns"`
-	Rows     [][]any  `json:"rows"`
-	RowCount int      `json:"row_count"`
+	Columns   []string `json:"columns"`
+	Rows      [][]any  `json:"rows"`
+	RowCount  int      `json:"row_count"`
+	Truncated bool     `json:"truncated,omitempty"`
 }
 
 // ExecResult reports the outcome of a non-query statement.
@@ -24,9 +25,11 @@ type ExecResult struct {
 	LastInsertID int64 `json:"last_insert_id"`
 }
 
-// RunQuery executes a read query and collects all rows. Column values that come
-// back as raw bytes are converted to strings so the JSON output is readable.
-func (s *Source) RunQuery(ctx context.Context, q engine.Query) (*ResultSet, error) {
+// RunQuery executes a read query and collects rows, up to maxRows (0 = no cap).
+// When more rows are available than maxRows, ResultSet.Truncated is set. Column
+// values that come back as raw bytes are converted to strings so the JSON
+// output is readable.
+func (s *Source) RunQuery(ctx context.Context, q engine.Query, maxRows int) (*ResultSet, error) {
 	db, err := s.DB()
 	if err != nil {
 		return nil, err
@@ -43,6 +46,11 @@ func (s *Source) RunQuery(ctx context.Context, q engine.Query) (*ResultSet, erro
 	}
 	rs := &ResultSet{Columns: cols, Rows: [][]any{}}
 	for rows.Next() {
+		if maxRows > 0 && len(rs.Rows) >= maxRows {
+			// A further row exists beyond the cap; flag and stop reading.
+			rs.Truncated = true
+			break
+		}
 		vals := make([]any, len(cols))
 		ptrs := make([]any, len(cols))
 		for i := range vals {

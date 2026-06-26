@@ -13,6 +13,7 @@ Config is the root configuration object.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `http` | HTTPConfig |  | HTTP holds settings for the streamable HTTP transport. |
+| `query_timeout_seconds` | integer |  | QueryTimeoutSeconds caps how long a single query or statement may run before it is cancelled. Defaults to 30 when unset. |
 | `sources` | map of SourceConfig | yes | Sources maps a logical source name to its database connection settings. At least one source is required. The source name is what MCP clients pass in the "source" argument of each tool call. |
 
 ## HTTPConfig

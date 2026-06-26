@@ -9,6 +9,10 @@
           "$ref": "#/$defs/HTTPConfig",
           "description": "HTTP holds settings for the streamable HTTP transport."
         },
+        "query_timeout_seconds": {
+          "type": "integer",
+          "description": "QueryTimeoutSeconds caps how long a single query or statement may run\nbefore it is cancelled. Defaults to 30 when unset."
+        },
         "sources": {
           "additionalProperties": {
             "$ref": "#/$defs/SourceConfig"

@@ -39,7 +39,7 @@ var (
 ```
 
 <a name="Execute"></a>
-## func [Execute](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/cli/cli.go#L27>)
+## func [Execute](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/cli/cli.go#L28>)
 
 ```go
 func Execute() error
@@ -88,7 +88,7 @@ const SchemaID = "https://github.com/stubbedev/mysql-mcp/raw/master/schema/confi
 ```
 
 <a name="DefaultConfigPath"></a>
-## func [DefaultConfigPath](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L127>)
+## func [DefaultConfigPath](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L131>)
 
 ```go
 func DefaultConfigPath() string
@@ -115,7 +115,7 @@ func GenerateSchema() ([]byte, error)
 GenerateSchema reflects the Config type into a JSON Schema document. Field descriptions are taken from Go doc comments when the source tree is available \(i.e. when run from a repository checkout\), and omitted otherwise.
 
 <a name="Locate"></a>
-## func [Locate](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L133>)
+## func [Locate](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L137>)
 
 ```go
 func Locate(explicit string) (string, error)
@@ -124,7 +124,7 @@ func Locate(explicit string) (string, error)
 Locate resolves the configuration file path. An explicit path is returned as\-is. Otherwise the XDG config directories are searched.
 
 <a name="Config"></a>
-## type [Config](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L21-L33>)
+## type [Config](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L21-L37>)
 
 Config is the root configuration object.
 
@@ -137,6 +137,10 @@ type Config struct {
     // HTTP holds settings for the streamable HTTP transport.
     HTTP HTTPConfig `json:"http,omitempty"`
 
+    // QueryTimeoutSeconds caps how long a single query or statement may run
+    // before it is cancelled. Defaults to 30 when unset.
+    QueryTimeoutSeconds int `json:"query_timeout_seconds,omitempty" validate:"omitempty,min=1"`
+
     // Sources maps a logical source name to its database connection settings.
     // At least one source is required. The source name is what MCP clients pass
     // in the "source" argument of each tool call.
@@ -145,7 +149,7 @@ type Config struct {
 ```
 
 <a name="Load"></a>
-### func [Load](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L145>)
+### func [Load](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L149>)
 
 ```go
 func Load(path string) (*Config, error)
@@ -154,7 +158,7 @@ func Load(path string) (*Config, error)
 Load reads, expands and validates the configuration at the given path. When path is empty the default XDG location is used.
 
 <a name="Parse"></a>
-### func [Parse](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L163>)
+### func [Parse](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L167>)
 
 ```go
 func Parse(raw []byte) (*Config, error)
@@ -163,7 +167,7 @@ func Parse(raw []byte) (*Config, error)
 Parse decodes, expands and validates configuration from raw JSON bytes. It is the testable core of Load.
 
 <a name="Config.Validate"></a>
-### func \(\*Config\) [Validate](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L177>)
+### func \(\*Config\) [Validate](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L181>)
 
 ```go
 func (c *Config) Validate() error
@@ -172,7 +176,7 @@ func (c *Config) Validate() error
 Validate runs struct validation plus cross\-field checks.
 
 <a name="HTTPConfig"></a>
-## type [HTTPConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L36-L58>)
+## type [HTTPConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L40-L62>)
 
 HTTPConfig configures the streamable HTTP transport.
 
@@ -203,7 +207,7 @@ type HTTPConfig struct {
 ```
 
 <a name="SSHConfig"></a>
-## type [SSHConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L98-L117>)
+## type [SSHConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L102-L121>)
 
 SSHConfig describes an SSH tunnel used to reach a remote database.
 
@@ -231,7 +235,7 @@ type SSHConfig struct {
 ```
 
 <a name="SourceConfig"></a>
-## type [SourceConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L62-L95>)
+## type [SourceConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L66-L99>)
 
 SourceConfig describes a single database a client can query. Connection details may be supplied either as a complete DSN or as discrete fields.
 
@@ -271,7 +275,7 @@ type SourceConfig struct {
 ```
 
 <a name="SourceConfig.IsRemote"></a>
-### func \(\*SourceConfig\) [IsRemote](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L123>)
+### func \(\*SourceConfig\) [IsRemote](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L127>)
 
 ```go
 func (s *SourceConfig) IsRemote() bool
@@ -280,7 +284,7 @@ func (s *SourceConfig) IsRemote() bool
 IsRemote reports whether the source is reached over an SSH tunnel.
 
 <a name="SourceConfig.Name"></a>
-### func \(\*SourceConfig\) [Name](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L120>)
+### func \(\*SourceConfig\) [Name](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L124>)
 
 ```go
 func (s *SourceConfig) Name() string
@@ -358,20 +362,20 @@ Package mcpserver wires the source registry into an MCP server, exposing a small
 
 ## Index
 
-- [func New\(reg \*source.Registry, version string, readonlyOverride bool\) \*mcp.Server](<#New>)
+- [func New\(reg \*source.Registry, version string, readonlyOverride bool, queryTimeout time.Duration\) \*mcp.Server](<#New>)
 - [func ServeHTTP\(ctx context.Context, srv \*mcp.Server, cfg config.HTTPConfig, logger \*slog.Logger\) error](<#ServeHTTP>)
 - [func ServeStdio\(ctx context.Context, srv \*mcp.Server\) error](<#ServeStdio>)
 - [type Service](<#Service>)
 
 
 <a name="New"></a>
-## func [New](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/server.go#L24>)
+## func [New](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/server.go#L29>)
 
 ```go
-func New(reg *source.Registry, version string, readonlyOverride bool) *mcp.Server
+func New(reg *source.Registry, version string, readonlyOverride bool, queryTimeout time.Duration) *mcp.Server
 ```
 
-New builds an MCP server exposing the database tools. readonlyOverride forces every source to behave as read\-only regardless of its config \(the global \-\-read\-only flag\).
+New builds an MCP server exposing the database tools. readonlyOverride forces every source to behave as read\-only regardless of its config \(the global \-\-read\-only flag\). queryTimeout caps each query/statement \(\<=0 disables it\).
 
 <a name="ServeHTTP"></a>
 ## func [ServeHTTP](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/transport.go#L24>)
@@ -392,7 +396,7 @@ func ServeStdio(ctx context.Context, srv *mcp.Server) error
 ServeStdio runs the server over stdio until ctx is cancelled or the client disconnects. This is the transport used directly by MCP clients and by stdio MCP proxies, which pipe a child process's stdin/stdout.
 
 <a name="Service"></a>
-## type [Service](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/server.go#L16-L19>)
+## type [Service](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/server.go#L20-L24>)
 
 Service holds the dependencies shared by all tool handlers.
 
@@ -431,7 +435,7 @@ Package source turns the validated config into live, lazily\-connected database 
   - [func \(s \*Source\) Readonly\(\) bool](<#Source.Readonly>)
   - [func \(s \*Source\) Remote\(\) bool](<#Source.Remote>)
   - [func \(s \*Source\) RunExec\(ctx context.Context, query string\) \(\*ExecResult, error\)](<#Source.RunExec>)
-  - [func \(s \*Source\) RunQuery\(ctx context.Context, q engine.Query\) \(\*ResultSet, error\)](<#Source.RunQuery>)
+  - [func \(s \*Source\) RunQuery\(ctx context.Context, q engine.Query, maxRows int\) \(\*ResultSet, error\)](<#Source.RunQuery>)
 
 
 <a name="RawQuery"></a>
@@ -444,7 +448,7 @@ func RawQuery(sql string) engine.Query
 RawQuery wraps a bare SQL string \(no positional args\) as an engine.Query.
 
 <a name="ExecResult"></a>
-## type [ExecResult](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L22-L25>)
+## type [ExecResult](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L23-L26>)
 
 ExecResult reports the outcome of a non\-query statement.
 
@@ -512,15 +516,16 @@ func (r *Registry) Names() []string
 Names returns all source names, sorted.
 
 <a name="ResultSet"></a>
-## type [ResultSet](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L15-L19>)
+## type [ResultSet](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L15-L20>)
 
 ResultSet is a generic, JSON\-friendly query result.
 
 ```go
 type ResultSet struct {
-    Columns  []string `json:"columns"`
-    Rows     [][]any  `json:"rows"`
-    RowCount int      `json:"row_count"`
+    Columns   []string `json:"columns"`
+    Rows      [][]any  `json:"rows"`
+    RowCount  int      `json:"row_count"`
+    Truncated bool     `json:"truncated,omitempty"`
 }
 ```
 
@@ -581,7 +586,7 @@ func (s *Source) Ping(ctx context.Context) error
 Ping verifies connectivity, establishing the SSH tunnel if needed.
 
 <a name="Source.QueryColumn"></a>
-### func \(\*Source\) [QueryColumn](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L86>)
+### func \(\*Source\) [QueryColumn](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L94>)
 
 ```go
 func (s *Source) QueryColumn(ctx context.Context, query string) ([]string, error)
@@ -608,7 +613,7 @@ func (s *Source) Remote() bool
 Remote reports whether the source is tunneled over SSH.
 
 <a name="Source.RunExec"></a>
-### func \(\*Source\) [RunExec](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L69>)
+### func \(\*Source\) [RunExec](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L77>)
 
 ```go
 func (s *Source) RunExec(ctx context.Context, query string) (*ExecResult, error)
@@ -617,13 +622,13 @@ func (s *Source) RunExec(ctx context.Context, query string) (*ExecResult, error)
 RunExec executes a write/DDL statement.
 
 <a name="Source.RunQuery"></a>
-### func \(\*Source\) [RunQuery](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L29>)
+### func \(\*Source\) [RunQuery](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L32>)
 
 ```go
-func (s *Source) RunQuery(ctx context.Context, q engine.Query) (*ResultSet, error)
+func (s *Source) RunQuery(ctx context.Context, q engine.Query, maxRows int) (*ResultSet, error)
 ```
 
-RunQuery executes a read query and collects all rows. Column values that come back as raw bytes are converted to strings so the JSON output is readable.
+RunQuery executes a read query and collects rows, up to maxRows \(0 = no cap\). When more rows are available than maxRows, ResultSet.Truncated is set. Column values that come back as raw bytes are converted to strings so the JSON output is readable.
 
 # sqlguard
 

@@ -39,7 +39,7 @@ var (
 ```
 
 <a name="Execute"></a>
-## func [Execute](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/cli/cli.go#L29>)
+## func Execute
 
 ```go
 func Execute() error
@@ -104,7 +104,7 @@ var ErrNotFound = errors.New("no config file found")
 ```
 
 <a name="DefaultConfigPath"></a>
-## func [DefaultConfigPath](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L155>)
+## func DefaultConfigPath
 
 ```go
 func DefaultConfigPath() string
@@ -113,7 +113,7 @@ func DefaultConfigPath() string
 DefaultConfigPath returns the XDG config path mysql\-mcp loads by default, whether or not the file exists.
 
 <a name="GenerateDocs"></a>
-## func [GenerateDocs](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/docs.go#L15>)
+## func GenerateDocs
 
 ```go
 func GenerateDocs() (string, error)
@@ -122,7 +122,7 @@ func GenerateDocs() (string, error)
 GenerateDocs renders human\-readable Markdown documentation for the config file from the same reflected schema used by GenerateSchema. Keeping both generators on one source of truth means the docs cannot drift from the schema.
 
 <a name="GenerateSchema"></a>
-## func [GenerateSchema](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/schema.go#L29>)
+## func GenerateSchema
 
 ```go
 func GenerateSchema() ([]byte, error)
@@ -131,7 +131,7 @@ func GenerateSchema() ([]byte, error)
 GenerateSchema reflects the Config type into a JSON Schema document. Field descriptions are taken from Go doc comments when the source tree is available \(i.e. when run from a repository checkout\), and omitted otherwise.
 
 <a name="Locate"></a>
-## func [Locate](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L161>)
+## func Locate
 
 ```go
 func Locate(explicit string) (string, error)
@@ -140,7 +140,7 @@ func Locate(explicit string) (string, error)
 Locate resolves the configuration file path. An explicit path is returned as\-is. Otherwise the XDG config directories are searched.
 
 <a name="Config"></a>
-## type [Config](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L39-L55>)
+## type Config
 
 Config is the root configuration object.
 
@@ -165,7 +165,7 @@ type Config struct {
 ```
 
 <a name="Load"></a>
-### func [Load](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L173>)
+### func Load
 
 ```go
 func Load(path string) (*Config, error)
@@ -174,7 +174,7 @@ func Load(path string) (*Config, error)
 Load reads, expands and validates the configuration at the given path. When path is empty the default XDG location is used.
 
 <a name="Parse"></a>
-### func [Parse](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L191>)
+### func Parse
 
 ```go
 func Parse(raw []byte) (*Config, error)
@@ -183,7 +183,7 @@ func Parse(raw []byte) (*Config, error)
 Parse decodes, expands and validates configuration from raw JSON bytes. It is the testable core of Load.
 
 <a name="Config.Validate"></a>
-### func \(\*Config\) [Validate](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L205>)
+### func \(\*Config\) Validate
 
 ```go
 func (c *Config) Validate() error
@@ -192,7 +192,7 @@ func (c *Config) Validate() error
 Validate runs struct validation plus cross\-field checks.
 
 <a name="HTTPConfig"></a>
-## type [HTTPConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L58-L80>)
+## type HTTPConfig
 
 HTTPConfig configures the streamable HTTP transport.
 
@@ -223,7 +223,7 @@ type HTTPConfig struct {
 ```
 
 <a name="DefaultHTTPConfig"></a>
-### func [DefaultHTTPConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L34>)
+### func DefaultHTTPConfig
 
 ```go
 func DefaultHTTPConfig() HTTPConfig
@@ -232,7 +232,7 @@ func DefaultHTTPConfig() HTTPConfig
 DefaultHTTPConfig returns the HTTP transport defaults applied when the config omits them \(and used when the server runs with no global config at all\).
 
 <a name="SSHConfig"></a>
-## type [SSHConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L126-L145>)
+## type SSHConfig
 
 SSHConfig describes an SSH tunnel used to reach a remote database.
 
@@ -260,7 +260,7 @@ type SSHConfig struct {
 ```
 
 <a name="SourceConfig"></a>
-## type [SourceConfig](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L84-L123>)
+## type SourceConfig
 
 SourceConfig describes a single database a client can query. Connection details may be supplied either as a complete DSN or as discrete fields.
 
@@ -306,7 +306,7 @@ type SourceConfig struct {
 ```
 
 <a name="SourceConfig.IsRemote"></a>
-### func \(\*SourceConfig\) [IsRemote](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L151>)
+### func \(\*SourceConfig\) IsRemote
 
 ```go
 func (s *SourceConfig) IsRemote() bool
@@ -315,7 +315,7 @@ func (s *SourceConfig) IsRemote() bool
 IsRemote reports whether the source is reached over an SSH tunnel.
 
 <a name="SourceConfig.Name"></a>
-### func \(\*SourceConfig\) [Name](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/config/config.go#L148>)
+### func \(\*SourceConfig\) Name
 
 ```go
 func (s *SourceConfig) Name() string
@@ -339,7 +339,7 @@ Package engine abstracts the SQL dialect specifics behind a small interface so a
 
 
 <a name="Engine"></a>
-## type [Engine](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/engine/engine.go#L21-L36>)
+## type Engine
 
 Engine encapsulates one database dialect: how to build its DSN and how to introspect its catalog.
 
@@ -363,7 +363,7 @@ type Engine interface {
 ```
 
 <a name="For"></a>
-### func [For](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/engine/engine.go#L39>)
+### func For
 
 ```go
 func For(name string) (Engine, error)
@@ -372,7 +372,7 @@ func For(name string) (Engine, error)
 For returns the Engine implementing the named dialect.
 
 <a name="Query"></a>
-## type [Query](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/engine/engine.go#L14-L17>)
+## type Query
 
 Query is a SQL string plus its positional arguments.
 
@@ -400,7 +400,7 @@ Package mcpserver wires the source registry into an MCP server, exposing a small
 
 
 <a name="New"></a>
-## func [New](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/server.go#L58>)
+## func New
 
 ```go
 func New(base *source.Registry, baseTimeout time.Duration, version string, readonlyOverride bool) *mcp.Server
@@ -409,7 +409,7 @@ func New(base *source.Registry, baseTimeout time.Duration, version string, reado
 New builds an MCP server exposing the database tools. base is the global fallback registry \(nil for roots\-only mode\). readonlyOverride forces every source to behave as read\-only regardless of its config \(the global \-\-read\-only flag\). baseTimeout caps each query/statement on the fallback registry \(\<=0 disables it\); per\-root configs carry their own timeout.
 
 <a name="ServeHTTP"></a>
-## func [ServeHTTP](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/transport.go#L24>)
+## func ServeHTTP
 
 ```go
 func ServeHTTP(ctx context.Context, srv *mcp.Server, cfg config.HTTPConfig, logger *slog.Logger) error
@@ -418,7 +418,7 @@ func ServeHTTP(ctx context.Context, srv *mcp.Server, cfg config.HTTPConfig, logg
 ServeHTTP runs the streamable HTTP transport until ctx is cancelled. It is proxy\-friendly: stateless mode, JSON responses and DNS\-rebind protection are all configurable so it can sit behind an MCP proxy or reverse proxy.
 
 <a name="ServeStdio"></a>
-## func [ServeStdio](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/transport.go#L17>)
+## func ServeStdio
 
 ```go
 func ServeStdio(ctx context.Context, srv *mcp.Server) error
@@ -427,7 +427,7 @@ func ServeStdio(ctx context.Context, srv *mcp.Server) error
 ServeStdio runs the server over stdio until ctx is cancelled or the client disconnects. This is the transport used directly by MCP clients and by stdio MCP proxies, which pipe a child process's stdin/stdout.
 
 <a name="Service"></a>
-## type [Service](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/mcpserver/server.go#L27-L37>)
+## type Service
 
 Service holds the dependencies shared by all tool handlers. It resolves the registry to use per call: a client that exposes a workspace root containing a RootConfigName file gets that config; everything else falls back to the server's global registry \(reg\), which may be nil in roots\-only mode.
 
@@ -471,7 +471,7 @@ Package source turns the validated config into live, lazily\-connected database 
 
 
 <a name="RawQuery"></a>
-## func [RawQuery](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L12>)
+## func RawQuery
 
 ```go
 func RawQuery(sql string) engine.Query
@@ -480,7 +480,7 @@ func RawQuery(sql string) engine.Query
 RawQuery wraps a bare SQL string \(no positional args\) as an engine.Query.
 
 <a name="ExecResult"></a>
-## type [ExecResult](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L23-L26>)
+## type ExecResult
 
 ExecResult reports the outcome of a non\-query statement.
 
@@ -492,7 +492,7 @@ type ExecResult struct {
 ```
 
 <a name="Registry"></a>
-## type [Registry](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L94-L96>)
+## type Registry
 
 Registry holds all configured sources, keyed by name.
 
@@ -503,7 +503,7 @@ type Registry struct {
 ```
 
 <a name="NewRegistry"></a>
-### func [NewRegistry](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L100>)
+### func NewRegistry
 
 ```go
 func NewRegistry(cfg *config.Config) (*Registry, error)
@@ -512,7 +512,7 @@ func NewRegistry(cfg *config.Config) (*Registry, error)
 NewRegistry builds a Registry from validated config, selecting an engine for each source and registering an SSH dialer for tunneled sources.
 
 <a name="Registry.Close"></a>
-### func \(\*Registry\) [Close](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L147>)
+### func \(\*Registry\) Close
 
 ```go
 func (r *Registry) Close()
@@ -521,7 +521,7 @@ func (r *Registry) Close()
 Close releases all pools and SSH tunnels.
 
 <a name="Registry.Get"></a>
-### func \(\*Registry\) [Get](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L119>)
+### func \(\*Registry\) Get
 
 ```go
 func (r *Registry) Get(name string) (*Source, error)
@@ -530,7 +530,7 @@ func (r *Registry) Get(name string) (*Source, error)
 Get returns the named source.
 
 <a name="Registry.List"></a>
-### func \(\*Registry\) [List](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L138>)
+### func \(\*Registry\) List
 
 ```go
 func (r *Registry) List() []*Source
@@ -539,7 +539,7 @@ func (r *Registry) List() []*Source
 List returns all sources, sorted by name.
 
 <a name="Registry.Names"></a>
-### func \(\*Registry\) [Names](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L128>)
+### func \(\*Registry\) Names
 
 ```go
 func (r *Registry) Names() []string
@@ -548,7 +548,7 @@ func (r *Registry) Names() []string
 Names returns all source names, sorted.
 
 <a name="ResultSet"></a>
-## type [ResultSet](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L15-L20>)
+## type ResultSet
 
 ResultSet is a generic, JSON\-friendly query result.
 
@@ -562,7 +562,7 @@ type ResultSet struct {
 ```
 
 <a name="Source"></a>
-## type [Source](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L19-L27>)
+## type Source
 
 Source is a single configured database plus its connection state.
 
@@ -573,7 +573,7 @@ type Source struct {
 ```
 
 <a name="Source.DB"></a>
-### func \(\*Source\) [DB](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L50>)
+### func \(\*Source\) DB
 
 ```go
 func (s *Source) DB() (*sql.DB, error)
@@ -582,7 +582,7 @@ func (s *Source) DB() (*sql.DB, error)
 DB returns the lazily\-opened connection pool for the source. The pool is created on first use; the database is not contacted until a query runs, so a temporarily unreachable database does not prevent the server from starting.
 
 <a name="Source.Description"></a>
-### func \(\*Source\) [Description](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L45>)
+### func \(\*Source\) Description
 
 ```go
 func (s *Source) Description() string
@@ -591,7 +591,7 @@ func (s *Source) Description() string
 Description returns the source's optional human\-readable description.
 
 <a name="Source.Engine"></a>
-### func \(\*Source\) [Engine](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L39>)
+### func \(\*Source\) Engine
 
 ```go
 func (s *Source) Engine() engine.Engine
@@ -600,7 +600,7 @@ func (s *Source) Engine() engine.Engine
 Engine returns the source's SQL dialect engine.
 
 <a name="Source.EngineName"></a>
-### func \(\*Source\) [EngineName](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L42>)
+### func \(\*Source\) EngineName
 
 ```go
 func (s *Source) EngineName() string
@@ -609,7 +609,7 @@ func (s *Source) EngineName() string
 EngineName returns the configured engine name.
 
 <a name="Source.Name"></a>
-### func \(\*Source\) [Name](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L30>)
+### func \(\*Source\) Name
 
 ```go
 func (s *Source) Name() string
@@ -618,7 +618,7 @@ func (s *Source) Name() string
 Name returns the source's logical name.
 
 <a name="Source.Ping"></a>
-### func \(\*Source\) [Ping](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L72>)
+### func \(\*Source\) Ping
 
 ```go
 func (s *Source) Ping(ctx context.Context) error
@@ -627,7 +627,7 @@ func (s *Source) Ping(ctx context.Context) error
 Ping verifies connectivity, establishing the SSH tunnel if needed.
 
 <a name="Source.QueryColumn"></a>
-### func \(\*Source\) [QueryColumn](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L94>)
+### func \(\*Source\) QueryColumn
 
 ```go
 func (s *Source) QueryColumn(ctx context.Context, query string) ([]string, error)
@@ -636,7 +636,7 @@ func (s *Source) QueryColumn(ctx context.Context, query string) ([]string, error
 QueryColumn runs a query expected to yield a single column and returns the values as strings. Used by introspection helpers like list\_databases.
 
 <a name="Source.Readonly"></a>
-### func \(\*Source\) [Readonly](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L33>)
+### func \(\*Source\) Readonly
 
 ```go
 func (s *Source) Readonly() bool
@@ -645,7 +645,7 @@ func (s *Source) Readonly() bool
 Readonly reports whether the source forbids writes.
 
 <a name="Source.Remote"></a>
-### func \(\*Source\) [Remote](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/source.go#L36>)
+### func \(\*Source\) Remote
 
 ```go
 func (s *Source) Remote() bool
@@ -654,7 +654,7 @@ func (s *Source) Remote() bool
 Remote reports whether the source is tunneled over SSH.
 
 <a name="Source.RunExec"></a>
-### func \(\*Source\) [RunExec](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L77>)
+### func \(\*Source\) RunExec
 
 ```go
 func (s *Source) RunExec(ctx context.Context, query string) (*ExecResult, error)
@@ -663,7 +663,7 @@ func (s *Source) RunExec(ctx context.Context, query string) (*ExecResult, error)
 RunExec executes a write/DDL statement.
 
 <a name="Source.RunQuery"></a>
-### func \(\*Source\) [RunQuery](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/source/query.go#L32>)
+### func \(\*Source\) RunQuery
 
 ```go
 func (s *Source) RunQuery(ctx context.Context, q engine.Query, maxRows int) (*ResultSet, error)
@@ -686,7 +686,7 @@ Package sqlguard classifies SQL statements so the server can enforce read\-only 
 
 
 <a name="EnsureReadOnly"></a>
-## func [EnsureReadOnly](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/sqlguard/sqlguard.go#L46>)
+## func EnsureReadOnly
 
 ```go
 func EnsureReadOnly(sql string) error
@@ -695,7 +695,7 @@ func EnsureReadOnly(sql string) error
 EnsureReadOnly returns an error if sql is not a pure read statement. Use it to gate execution against read\-only sources.
 
 <a name="ReadOnly"></a>
-## func [ReadOnly](<https://github.com/stubbedev/mysql-mcp/blob/master/internal/sqlguard/sqlguard.go#L16>)
+## func ReadOnly
 
 ```go
 func ReadOnly(sql string) (bool, error)

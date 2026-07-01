@@ -41,6 +41,9 @@ func (s *Source) Engine() engine.Engine { return s.eng }
 // EngineName returns the configured engine name.
 func (s *Source) EngineName() string { return s.cfg.Engine }
 
+// Description returns the source's optional human-readable description.
+func (s *Source) Description() string { return s.cfg.Description }
+
 // DB returns the lazily-opened connection pool for the source. The pool is
 // created on first use; the database is not contacted until a query runs, so a
 // temporarily unreachable database does not prevent the server from starting.
@@ -83,6 +86,7 @@ func (s *Source) close() {
 	}
 	if s.ssh != nil {
 		s.ssh.close()
+		deregisterSSHDialer(s.netName)
 	}
 }
 

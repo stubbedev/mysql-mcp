@@ -3,6 +3,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -52,39 +53,55 @@ func serveCmd() *cobra.Command {
 		Use:   "serve",
 		Short: "Run the MCP server",
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			// Logs go to stderr so they never corrupt the stdio JSON-RPC stream.
+			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+
+			// The global config is optional: without one the server runs in
+			// roots-only mode, serving each client from its workspace's
+			// RootConfigName file. An explicit --config that fails to load is
+			// still fatal.
+			var (
+				base        *source.Registry
+				baseTimeout time.Duration
+				httpCfg     = config.DefaultHTTPConfig()
+			)
 			cfg, err := config.Load(configPath)
-			if err != nil {
+			switch {
+			case err == nil:
+				base, err = source.NewRegistry(cfg)
+				if err != nil {
+					return err
+				}
+				defer base.Close()
+				baseTimeout = time.Duration(cfg.QueryTimeoutSeconds) * time.Second
+				httpCfg = cfg.HTTP
+			case configPath == "" && errors.Is(err, config.ErrNotFound):
+				logger.Warn("no global config; serving in roots-only mode",
+					"hint", "each client must expose a workspace root containing "+config.RootConfigName)
+			default:
 				return err
 			}
 			if httpAddr != "" {
-				cfg.HTTP.Addr = httpAddr
+				httpCfg.Addr = httpAddr
 			}
 
-			reg, err := source.NewRegistry(cfg)
-			if err != nil {
-				return err
-			}
-			defer reg.Close()
-
-			srv := mcpserver.New(reg, Version, readOnly, time.Duration(cfg.QueryTimeoutSeconds)*time.Second)
-			// Logs go to stderr so they never corrupt the stdio JSON-RPC stream.
-			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+			srv := mcpserver.New(base, baseTimeout, Version, readOnly)
 
 			ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer stop()
 
 			switch transport {
 			case "stdio":
-				logger.Info("serving MCP over stdio", "sources", reg.Names())
+				logger.Info("serving MCP over stdio", "sources", registryNames(base))
 				return mcpserver.ServeStdio(ctx, srv)
 			case "http":
-				return mcpserver.ServeHTTP(ctx, srv, cfg.HTTP, logger)
+				return mcpserver.ServeHTTP(ctx, srv, httpCfg, logger)
 			default:
 				return fmt.Errorf("unknown transport %q (want stdio or http)", transport)
 			}
 		},
 	}
-	cmd.Flags().StringVarP(&configPath, "config", "c", "", "path to config file (default: XDG config dir)")
+	cmd.Flags().StringVarP(&configPath, "config", "c", "", "path to global config file (default: XDG config dir; optional when clients supply per-workspace .mysql-mcp.json via MCP roots)")
 	cmd.Flags().StringVarP(&transport, "transport", "t", "stdio", "transport: stdio or http")
 	cmd.Flags().StringVar(&httpAddr, "http-addr", "", "HTTP listen address (overrides config http.addr)")
 	cmd.Flags().BoolVar(&readOnly, "read-only", false, "force every source read-only regardless of config")
@@ -134,6 +151,15 @@ func versionCmd() *cobra.Command {
 			return err
 		},
 	}
+}
+
+// registryNames returns the fallback registry's source names for a startup log
+// line; nil registry (roots-only mode) yields none.
+func registryNames(reg *source.Registry) []string {
+	if reg == nil {
+		return nil
+	}
+	return reg.Names()
 }
 
 // writeOutput writes data to path, or to stdout when path is "-".

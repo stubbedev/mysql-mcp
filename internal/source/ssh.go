@@ -39,6 +39,12 @@ func registerSSHDialer(t *sshTunnel) string {
 	return name
 }
 
+// deregisterSSHDialer removes a dialer from the driver's process-global
+// registry. Called when a source closes so reloading a per-workspace config
+// (mtime change) does not leak dialer registrations. Names are never reused, so
+// this is always safe.
+func deregisterSSHDialer(name string) { mysql.DeregisterDialContext(name) }
+
 // dial opens a connection to addr through the tunnel, reconnecting once if the
 // cached SSH client has gone stale.
 func (t *sshTunnel) dial(ctx context.Context, addr string) (net.Conn, error) {

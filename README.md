@@ -10,6 +10,10 @@ Built on the official [`modelcontextprotocol/go-sdk`](https://github.com/modelco
 ## Features
 
 - **Multiple named sources** in one config — point at several databases at once.
+  Each source takes an optional `description`, surfaced via `list_sources` so a
+  model can pick the right one for a task on its own.
+- **Per-workspace config via MCP roots** — one server serves many clients, each
+  resolving its own `.mysql-mcp.json` from its workspace root (stdio or HTTP).
 - **Local or SSH-tunneled** sources, with enforced host-key verification.
 - **Read-only sources**: a real SQL parser rejects anything that isn't a pure
   read; the `write_query` tool is refused entirely.
@@ -56,6 +60,7 @@ override with `--config`.
   "sources": {
     "local": {
       "engine": "mysql",
+      "description": "Local dev database for the app; safe to read.",
       "host": "127.0.0.1",
       "user": "root",
       "password": "${LOCAL_DB_PASSWORD}",
@@ -95,6 +100,49 @@ Add an `ssh` block to a source to tunnel the database connection. The database
 - `--read-only` on the command line forces **every** source read-only.
 - The HTTP transport defaults to loopback (`127.0.0.1`) with DNS-rebind
   protection on. Only relax these when a trusted proxy sits in front.
+
+### Per-workspace config (MCP roots)
+
+One server can serve several clients, each with its own sources — no need to
+tell the model which connection to use. On every tool call the server resolves
+the config from the calling client's **MCP workspace root**:
+
+1. If a client root contains a `.mysql-mcp.json`, that file's sources are used
+   (same schema as the global config; loaded per client, reloaded when the file
+   changes).
+2. Otherwise the server falls back to its global `--config` / XDG config.
+3. If neither exists, the call returns an error asking for a workspace config.
+
+This works over **both stdio and HTTP** — the root comes from the MCP `roots`
+capability the client advertises (e.g. Claude Code exposes the open workspace).
+A proxy that cannot use the roots protocol may instead inject roots via a
+request header: `X-Mcp-Roots: file:///path/to/repo` (comma-separated for
+several; `X-Mcp-Root` / `Mcp-Roots` / `Mcp-Root` also accepted).
+
+Header roots are **request-scoped**: they apply only to the request that carries
+them and are never cached on the session. A proxy that multiplexes several
+clients over one MCP session can therefore vary the header per request without
+one client seeing another's sources — but it must send the header on *every*
+request, not just the first. The `roots/list` protocol result, by contrast, is
+cached per session (one client per session, as for stdio and stateful HTTP).
+
+Because the config can come entirely from clients, the global config is
+**optional**: start `mysql-mcp serve` with no `--config` and it runs in
+roots-only mode, serving each client from its own `.mysql-mcp.json`.
+
+```jsonc
+// <repo>/.mysql-mcp.json — committed per project (gitignore it if it holds secrets)
+{
+  "sources": {
+    "app": {
+      "engine": "mysql",
+      "description": "This project's dev database.",
+      "host": "127.0.0.1", "database": "app", "user": "root",
+      "password": "${APP_DB_PASSWORD}", "readonly": true
+    }
+  }
+}
+```
 
 ## Running
 

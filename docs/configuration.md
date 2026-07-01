@@ -35,6 +35,7 @@ SourceConfig describes a single database a client can query.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `engine` | string | yes | Engine selects the database dialect. Supported in this release: "mysql" and "mariadb" (handled identically). |
+| `description` | string |  | Description is an optional human-readable summary of what this source is for (e.g. "production analytics replica, read-only"). It is surfaced to MCP clients via list_sources so a model can pick the right source for a task without being told which one to use. |
 | `dsn` | string |  | DSN is a complete go-sql-driver/mysql data source name. When set, the discrete host/port/user/password/database fields are ignored. The DSN must not specify a custom net when SSH is configured. |
 | `host` | string |  | Host is the database host. Defaults to 127.0.0.1. |
 | `port` | integer |  | Port is the database port. Defaults to 3306. |

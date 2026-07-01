@@ -100,6 +100,10 @@
           "type": "string",
           "description": "Engine selects the database dialect. Supported in this release: \"mysql\"\nand \"mariadb\" (handled identically)."
         },
+        "description": {
+          "type": "string",
+          "description": "Description is an optional human-readable summary of what this source is\nfor (e.g. \"production analytics replica, read-only\"). It is surfaced to\nMCP clients via list_sources so a model can pick the right source for a\ntask without being told which one to use."
+        },
         "dsn": {
           "type": "string",
           "description": "DSN is a complete go-sql-driver/mysql data source name. When set, the\ndiscrete host/port/user/password/database fields are ignored. The DSN\nmust not specify a custom net when SSH is configured."

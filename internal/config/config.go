@@ -5,6 +5,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,6 +17,23 @@ import (
 
 // AppName is the XDG application directory name (e.g. $XDG_CONFIG_HOME/mysql-mcp).
 const AppName = "mysql-mcp"
+
+// RootConfigName is the per-workspace config file name looked up at a client's
+// MCP workspace root. When present it overrides the server's global config for
+// that client, enabling one server to serve several clients each with their own
+// sources.
+const RootConfigName = ".mysql-mcp.json"
+
+// ErrNotFound is returned by Locate/Load when no config file exists at the
+// default search path. Callers may treat this as "run without a global config"
+// rather than a hard failure.
+var ErrNotFound = errors.New("no config file found")
+
+// DefaultHTTPConfig returns the HTTP transport defaults applied when the config
+// omits them (and used when the server runs with no global config at all).
+func DefaultHTTPConfig() HTTPConfig {
+	return HTTPConfig{Addr: "127.0.0.1:7000", Path: "/mcp"}
+}
 
 // Config is the root configuration object.
 type Config struct {
@@ -67,6 +85,12 @@ type SourceConfig struct {
 	// Engine selects the database dialect. Supported in this release: "mysql"
 	// and "mariadb" (handled identically).
 	Engine string `json:"engine" validate:"required,oneof=mysql mariadb"`
+
+	// Description is an optional human-readable summary of what this source is
+	// for (e.g. "production analytics replica, read-only"). It is surfaced to
+	// MCP clients via list_sources so a model can pick the right source for a
+	// task without being told which one to use.
+	Description string `json:"description,omitempty"`
 
 	// DSN is a complete go-sql-driver/mysql data source name. When set, the
 	// discrete host/port/user/password/database fields are ignored. The DSN
@@ -141,7 +165,7 @@ func Locate(explicit string) (string, error) {
 	if p, err := xdg.SearchConfigFile(filepath.Join(AppName, "config.json")); err == nil {
 		return p, nil
 	}
-	return "", fmt.Errorf("no config file found; create %s or pass --config", DefaultConfigPath())
+	return "", fmt.Errorf("%w; create %s or pass --config", ErrNotFound, DefaultConfigPath())
 }
 
 // Load reads, expands and validates the configuration at the given path. When
@@ -195,11 +219,12 @@ func (c *Config) Validate() error {
 }
 
 func (c *Config) applyDefaults() {
+	d := DefaultHTTPConfig()
 	if c.HTTP.Addr == "" {
-		c.HTTP.Addr = "127.0.0.1:7000"
+		c.HTTP.Addr = d.Addr
 	}
 	if c.HTTP.Path == "" {
-		c.HTTP.Path = "/mcp"
+		c.HTTP.Path = d.Path
 	}
 	if c.QueryTimeoutSeconds == 0 {
 		c.QueryTimeoutSeconds = 30

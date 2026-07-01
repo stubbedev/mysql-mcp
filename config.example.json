@@ -10,6 +10,7 @@
   "sources": {
     "local": {
       "engine": "mysql",
+      "description": "Local development database for the app. Safe to read; treat as disposable.",
       "host": "127.0.0.1",
       "port": 3306,
       "user": "root",
@@ -19,6 +20,7 @@
     },
     "reporting": {
       "engine": "mariadb",
+      "description": "Analytics replica for reporting and BI queries. Read-only, reachable via bastion; use for heavy aggregate scans.",
       "host": "10.0.0.5",
       "port": 3306,
       "user": "readonly",
